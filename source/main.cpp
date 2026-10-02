@@ -22,7 +22,7 @@ typedef struct {
     init(init_size), destroy (deinit), resize_up, push, pop, dump, verify
 */
 int stack_init(Stack *, size_t init_size);
-// push(stack_t *stk, double what_to_push);
+int verify(Stack *, char *);
 int destroy(Stack *);
 int resize_up(Stack *);
 int resize_down(Stack *);
@@ -100,6 +100,17 @@ int stack_init(Stack *stk, size_t init_size) {
     }
 
     return STACK_ERROR_SUCCESS;
+}
+
+int verify(Stack *stk, char *func_name) {
+    if (stk->data == NULL) {
+        fprintf(stderr, "ERROR: data is zero pointer in %s", func_name);
+        return STACK_ERROR_SIZE_DATA;
+    }
+    if (stk->size > stk->capacity || stk->capacity <= 0) {
+        fprintf(stderr, "ERROR: wrong size or capacity in %s", func_name);
+        return STACK_ERROR_SIZE_DATA;
+    }
 }
 
 int destroy(Stack *stk) {
