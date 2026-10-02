@@ -25,7 +25,8 @@ int stack_init(Stack *, size_t init_size);
 // push(stack_t *stk, double what_to_push);
 int destroy(Stack *);
 int resize_up(Stack *);
-int push(Stack *);
+int resize_down(Stack *);
+int push(Stack *, double elem);
 int pop(Stack *, double *elem);
 void dump(Stack *);
 
@@ -41,18 +42,35 @@ int main() {
         return 1;
     }
 
-    for (int i = 0; i < 7; i++) {
-        int res_push = push(&stk);
+    for (int i = 0; i < 6; i++) {
+        double elem = 0.0;
+        scanf("%lg", &elem);
+        int res_push = push(&stk, elem);
         if (res_push != STACK_ERROR_SUCCESS) {
             printf("ERROR: wrong in push\n");
             return 1;
         }
     }
 
+    printf("\n");
     for (int n = 0; n < stk.size; n++) {
         fprintf(stderr, "data[%d] = <%lg>\n", n, stk.data[n]);
     }
 
+    printf("\n");
+
+    for (int i = 5; i > 0; i--) {
+        double elem = 0.0;
+        int res_pop = pop(&stk, &elem);
+        if (res_pop != STACK_ERROR_SUCCESS) {
+            printf("ERROR: wrong in push\n");
+            return 1;
+        }
+        else
+            printf("pop - <%lg>\n", elem);
+    }
+
+    dump(&stk);
     //int code = 0b00001011101011011100101011111110;
 
     int res_destroy = destroy(&stk);
@@ -120,11 +138,29 @@ int resize_up(Stack *stk) {
     return STACK_ERROR_SUCCESS;
 }
 
-int push(Stack *stk) {
+int resize_down(Stack *stk) {
     assert(stk);
 
-    double elem = 0.0;
-    if (scanf("%lg", &elem) != 1) {
+    if (stk->size > stk->capacity || stk->capacity < 1 || stk->data == NULL){
+        printf("ERROR: wrong input stk in resize_up\n");
+        return STACK_ERROR_INPUT;
+    }
+    else if (stk->size * stk->size <= stk->capacity && stk->size > 2) { //REVIEW - change 2 to 7
+        stk->data = (double *)realloc(stk->data, ((size_t)stk->size + 1)*sizeof(stk->data[0]));//MENTOR - make "2" a param ??
+        stk->capacity = stk->size + 1;
+
+        if (stk->data == NULL) {
+            printf("ERROR: null data pointer in resize_down\n");
+            return STACK_ERROR_MEMORY_ALLOC;
+        }
+    }
+    return STACK_ERROR_SUCCESS;
+}
+
+int push(Stack *stk, double elem) {
+    assert(stk);
+
+    if (stk->data == NULL) {
         printf("ERROR: wrong input in push\n");
         return STACK_ERROR_INPUT;
     }
@@ -142,6 +178,7 @@ int push(Stack *stk) {
         printf("ERROR: wrong data size in push\n");
         return STACK_ERROR_MEMORY_ALLOC;
     }
+
     return STACK_ERROR_SUCCESS;
 }
 
@@ -150,17 +187,27 @@ int pop(Stack * stk, double *elem) {
     assert(elem);
 
     if (stk->size > 0) {
-        *elem = (stk->data)[stk->size--];
+        *elem = (stk->data)[--stk->size];
+        // stk->size--;
     }
     else {
         return STACK_ERROR_SIZE_DATA;
     }
+
+    int res_resize_down = resize_down(stk);
+    if (res_resize_down != STACK_ERROR_SUCCESS) {
+        printf("ERROR: wrong resize_down in pop\n");
+        return STACK_ERROR_MEMORY_ALLOC;
+    }
+
     return STACK_ERROR_SUCCESS;
 }
 
 void dump(Stack *stk) {
+    printf("----------------------------------------DUMP-------------------------------------------\n");
     time_t t = time(NULL);
-    printf("%s\n", ctime(&t));
+    printf("%s", ctime(&t));
     printf("Accessible memory: %ld\n", stk->capacity);
     printf("Memory in use: %ld\n", stk->size);
+    printf("---------------------------------------------------------------------------------------\n");
 }
