@@ -1,26 +1,8 @@
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <time.h>
-
-enum stack_error_t { //NOTE - при верной работе возвращаемое значение 0
-    STACK_ERROR_SUCCESS = 1, //Верная работа
-    STACK_ERROR_INPUT, //Ошибки связанные с переданными в функцию переменными
-    STACK_ERROR_MEMORY_ALLOC, //Ошибки выделения памяти
-    STACK_ERROR_SIZE_DATA,//Ошибки связанные с выходом за границу массива
-    STACK_ERROR_STK_FUNC, //Ошибки связанные с некорректной работой функций
-};
-
-typedef struct {
-        double *data;
-        long int size;
-        long int capacity;
-} Stack;
-
-// TODO
-/*
+TODO - /*
     init(init_size), destroy (deinit), resize_up, push, pop, dump, verify
 */
+#include "main.h" 
+
 int stack_init(Stack *, size_t init_size);
 int verify(Stack *, char *);
 int destroy(Stack *);
@@ -30,6 +12,7 @@ int push(Stack *, double elem);
 int pop(Stack *, double *elem);
 void dump(Stack *);
 
+\\SHA256:sUEDV1zjr/mzAS1gPbNEjBuErE6+xFLJP5LRKaLh0ds
 
 int main() {
     Stack stk = {};
@@ -111,6 +94,7 @@ int verify(Stack *stk, char *func_name) {
         fprintf(stderr, "ERROR: wrong size or capacity in %s", func_name);
         return STACK_ERROR_SIZE_DATA;
     }
+    return STACK_ERROR_SUCCESS;
 }
 
 int destroy(Stack *stk) {
